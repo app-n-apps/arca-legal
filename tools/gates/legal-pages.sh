@@ -40,24 +40,58 @@ for page in privacy-policy.html terms-of-use.html support.html; do
     fi
   fi
 
-  # Count the original file locally; the appended HTTP status preserves body
-  # newlines in the remote response until we separate the status above.
-  if [[ $mode == local ]]; then
-    bytes=$(wc -c < "$base/$page")
-  else
-    bytes=$(printf '%s' "$body" | wc -c)
+  # Parse HTML rather than counting markup or matching comments/CSS/scripts.
+  # Python runs isolated and uses only the standard library, without temp files.
+  if ! visible=$(printf '%s' "$body" | python3 -I -c '
+from html.parser import HTMLParser
+import re
+import sys
+
+class VisibleText(HTMLParser):
+    blocked = {"head", "style", "script", "template"}
+    blocks = {"p", "div", "li", "h1", "h2", "h3", "br", "header", "footer", "main", "nav", "section"}
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.depth = 0
+        self.parts = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag in self.blocked:
+            self.depth += 1
+        if not self.depth and tag in self.blocks:
+            self.parts.append(" ")
+
+    def handle_endtag(self, tag):
+        if tag in self.blocked:
+            self.depth = max(0, self.depth - 1)
+        if not self.depth and tag in self.blocks:
+            self.parts.append(" ")
+
+    def handle_data(self, data):
+        if not self.depth:
+            self.parts.append(data)
+
+parser = VisibleText()
+parser.feed(sys.stdin.read())
+parser.close()
+sys.stdout.write(re.sub(r"\s+", " ", "".join(parser.parts)).strip())
+'); then
+    fail "$page: could not extract visible text"
+    continue
   fi
+  bytes=$(printf '%s' "$visible" | wc -c)
   if (( bytes < 2048 )); then
-    fail "$page: $bytes bytes (minimum 2048)"
+    fail "$page: $bytes visible-text bytes (minimum 2048)"
   fi
-  if [[ $body != *Arca* ]]; then
+  if ! grep -qw 'Arca' <<< "$visible"; then
     fail "$page: missing Arca"
   fi
   if [[ $page == privacy-policy.html ]]; then
     for required in 'Google Gemini' OpenAI OpenRouter eBay Firebase \
       'Apple DeviceCheck' 'App Attest' Apphud AppsFlyer Amplitude \
       Crashlytics iCloud 'photos are not stored' 'Delete my data'; do
-      if [[ $body != *"$required"* ]]; then
+      if [[ $visible != *"$required"* ]]; then
         fail "$page: missing $required"
       fi
     done

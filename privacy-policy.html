@@ -27,19 +27,21 @@ code { font-size: .95em; }
 <p class="meta">Last updated: October 19, 2026 · Developer: app-n-apps</p>
 <p>Arca is a coin scanner developed by app-n-apps. This policy explains the data used for identification, price references, subscriptions, analytics, and your collection.</p>
 <h2>Coin photos and AI identification</h2>
-<p id="photos">When you scan, two compressed photos of your selected coin, with EXIF metadata and GPS removed, go to our server, then through OpenRouter to Google Gemini / OpenAI to identify the coin and estimate its condition. On our server, photos are not stored. Provider-side retention follows the providers' policies; our API key is configured for “no training/no logging.” This server statement does not mean that photos stay on your device.</p>
+<p id="photos">When you scan, one or two compressed photos of your selected coin, with EXIF metadata and GPS removed, go to our server, then through OpenRouter to Google Gemini / OpenAI to identify the coin and estimate its condition. On our server, photos are not stored. Provider-side retention follows the providers' policies; we request providers that do not train on or retain your data, where OpenRouter supports this setting. Your photos therefore leave your device when you scan.</p>
 <h2>Price references</h2>
 <p id="ebay">Coin attributes go through our server to the eBay Browse API to find listings, without user data. Only an aggregate is cached, without a user association.</p>
 <h2>Server records and subscriptions</h2>
-<p id="firebase">Firebase (Firestore) holds an anonymous <code>uid</code>, counters, scan results (for one hour), Pro status, and <code>originalTransactionId</code> for usage limits, preventing duplicate processing, and subscriptions. Server records are retained until you use “Delete my data,” except for the one-hour scan results and the <code>transactions/*</code> transaction document, which remains after deletion.</p>
-<p id="jws">Signed transaction information (JWS) is sent to our server to verify Pro access. The retained transaction fields are <code>originalTransactionId</code> and <code>expiresAt</code>.</p>
+<p id="firebase">Firebase (Authentication, Firestore, Cloud Functions, App Check, Crashlytics) holds an anonymous <code>uid</code>, counters, scan results (for one hour), Pro status, and <code>originalTransactionId</code> for usage limits, preventing duplicate processing, and subscriptions. These install-linked records are retained until you use “Delete my data,” except for the one-hour scan results and the transaction document described below. If server deletion has not completed, the records remain.</p>
+<p id="jws">Signed transaction information (JWS) is sent to our server to verify Pro access. The <code>transactions/*</code> document remains with its <code>originalTransactionId</code> identifier and a map of linked app user IDs and their last-seen timestamps. Successful server deletion removes your old <code>uid</code> from that map. The <code>expiresAt</code> field is stored in your entitlement record and is deleted with that record. When Pro access is refreshed after deletion, the new anonymous <code>uid</code> can be linked to the transaction again.</p>
+<p id="recognition-cache">Recognition results (coin attributes and grade, without photos) are cached on our server for up to 30 days under a key derived from photo hashes, without a link to your <code>uid</code>. “Delete my data” does not remove this cache. Server logs contain photo hashes and sizes, not the photos themselves.</p>
 <h2>App integrity and the free allowance</h2>
 <p id="devicecheck">Apple DeviceCheck uses a device token and two bits held by Apple to enforce the free allowance, without a link to your <code>uid</code>. These bits are not reset by “Delete my data.” App Attest verifies that requests come from the authentic app.</p>
 <h2>Analytics, attribution, and crash reports</h2>
-<p id="amplitude">Amplitude receives and retains app events, your <code>uid</code>, and IDFV (the identifier for vendor) for analytics. IP addresses and city information are not collected in Amplitude.</p>
+<p id="amplitude">Amplitude receives and retains app events, your <code>uid</code>, and IDFV (the identifier for vendor) for analytics. Amplitude is configured not to retain IP addresses or city information.</p>
 <p id="appsflyer">AppsFlyer receives and retains installation and purchase information, <code>uid</code>, and IDFV for attribution through SKAN/AdServices, without IDFA.</p>
-<p id="crashlytics">Crashlytics receives and retains crash reports to help improve stability.</p>
-<p id="apphud">Apphud receives and retains purchase information to support subscriptions.</p>
+<p id="crashlytics">Crashlytics receives and retains crash reports linked to your app user ID (<code>uid</code>) to help improve stability.</p>
+<p id="apphud">Apphud receives and retains purchase and subscription information linked to your app user ID and IDFV to support subscriptions.</p>
+<p id="network">Our server (Firebase) and SDK providers receive your device's IP address as part of network requests. Amplitude is configured not to retain IP addresses or city information.</p>
 <h2>Your collection</h2>
 <p id="icloud">Your collection and coin photos are stored in your own iCloud for synchronization.</p>
 <h2>Data we do not collect</h2>
@@ -49,14 +51,21 @@ code { font-size: .95em; }
 <ol id="delete-steps">
 <li>Delete your collection and scan history on this device.</li>
 <li>Sync the deletion to your iCloud. If synchronization cannot finish within 20 seconds, Arca shows “Will finish syncing when online” and keeps the deletion pending.</li>
-<li>Delete server records for this install. If offline, Arca queues this step and retries on the next launch. The old <code>uid</code> is removed from the transaction document's user set, but the <code>transactions/*</code> document remains.</li>
+<li>Delete server records for this install. If you are offline, Arca retries when a connection is available; until then the server records remain. When server deletion succeeds, the old <code>uid</code> is removed from the transaction document's user set, but the <code>transactions/*</code> document remains.</li>
 <li>Reset app preferences, except onboarding progress.</li>
 <li>Sign out of the old Apphud identity and start a new anonymous <code>uid</code>. Arca checks current Apple subscription entitlements to preserve Pro access without opening a purchase-restoration sign-in prompt.</li>
 <li>Return to Home. Apple DeviceCheck bits remain unchanged.</li>
 </ol>
+<p id="deletion-limits">The button deletes the Arca server records for this install described above when server deletion succeeds. It does not delete data already sent to Amplitude, AppsFlyer, Crashlytics, Apphud, or the AI providers (OpenRouter, Google Gemini / OpenAI); they retain data under their own policies. The recognition cache, transaction document, and Apple DeviceCheck bits described above also remain.</p>
 <p id="delete-contact">For help with deletion, email <a href="mailto:playnowthisgame@gmail.com">playnowthisgame@gmail.com</a>. “Delete my data” does not cancel your subscription; manage cancellation in your Apple ID subscription settings.</p>
-<h2>Age rating and contact</h2>
-<p>Arca is rated 4+. For privacy questions, contact app-n-apps at <a href="mailto:playnowthisgame@gmail.com">playnowthisgame@gmail.com</a>.</p>
+<h2>Permissions</h2>
+<p>You can revoke camera, photo library, and notification permissions in iOS Settings. Open Settings, find Arca, and change the relevant permissions; notification controls are also available under Notifications → Arca.</p>
+<h2>Children</h2>
+<p>Arca is rated 4+. The app is not intended to collect data from children.</p>
+<h2>Your rights and questions</h2>
+<p>For questions about your privacy rights or help with a data request, contact app-n-apps at <a href="mailto:playnowthisgame@gmail.com">playnowthisgame@gmail.com</a>.</p>
+<h2>Changes to this policy</h2>
+<p>Changes to this policy are published on this page. The “Last updated” date at the top shows when this policy was last revised.</p>
 </main>
 <footer>© 2026 app-n-apps · Arca · <a href="mailto:playnowthisgame@gmail.com">playnowthisgame@gmail.com</a></footer>
 </body>
