@@ -24,7 +24,7 @@ code { font-size: .95em; }
 <header><nav aria-label="Legal and support"><a href="index.html">Arca</a><a href="privacy-policy.html">Privacy Policy</a><a href="terms-of-use.html">Terms of Use</a><a href="support.html">Support</a></nav></header>
 <main id="main">
 <h1>Privacy Policy</h1>
-<p class="meta">Last updated: October 19, 2026 · Developer: app-n-apps</p>
+<p class="meta">Last updated: October 21, 2026 · Developer: app-n-apps</p>
 <p>Arca is a coin scanner developed by app-n-apps. This policy explains the data used for identification, price references, subscriptions, analytics, and your collection.</p>
 <h2>Coin photos and AI identification</h2>
 <p id="photos">When you scan, one or two compressed photos of your selected coin, with EXIF metadata and GPS removed, go to our server, then through OpenRouter to Google Gemini / OpenAI to identify the coin and estimate its condition. On our server, photos are not stored. Provider-side retention follows the providers' policies; we request providers that do not train on or retain your data, where OpenRouter supports this setting. Your photos therefore leave your device when you scan.</p>
@@ -51,14 +51,14 @@ code { font-size: .95em; }
 <ol id="delete-steps">
 <li>Delete your collection and scan history on this device.</li>
 <li>Sync the deletion to your iCloud. If synchronization cannot finish within 20 seconds, Arca shows “Will finish syncing when online” and keeps the deletion pending.</li>
-<li>Delete server records for this install. If you are offline, Arca retries when a connection is available; until then the server records remain. When server deletion succeeds, the old <code>uid</code> is removed from the transaction document's user set, but the <code>transactions/*</code> document remains.</li>
-<li>Reset app preferences, except onboarding progress.</li>
-<li>Sign out of the old Apphud identity and start a new anonymous <code>uid</code>. Arca checks current Apple subscription entitlements to preserve Pro access without opening a purchase-restoration sign-in prompt.</li>
+<li>Delete server records for this install, including the anonymous Firebase Authentication record of your previous app user ID (<code>uid</code>). If you are offline, Arca retries when you open the app or return to it with a connection; until then the server records remain. When server deletion succeeds, the old <code>uid</code> is removed from the transaction document's user set, but the <code>transactions/*</code> document remains.</li>
+<li>Reset app preferences, except onboarding progress. “Coin of the day” notifications are turned off and already scheduled ones are removed; you can turn them on again in Settings.</li>
+<li>After server deletion succeeds, sign out of the old Apphud identity, clear the old <code>uid</code> from analytics and crash reporting on this device, and start a new anonymous <code>uid</code>. Arca checks current Apple subscription entitlements to preserve Pro access without opening a purchase-restoration sign-in prompt.</li>
 <li>Return to Home. Apple DeviceCheck bits remain unchanged.</li>
 </ol>
-<p id="deletion-limits">The button deletes the Arca server records for this install described above when server deletion succeeds. It does not delete data already sent to Amplitude, AppsFlyer, Crashlytics, Apphud, or the AI providers (OpenRouter, Google Gemini / OpenAI); they retain data under their own policies. The recognition cache, transaction document, Apple DeviceCheck bits, and the anonymous Firebase Authentication record of your previous app user ID (<code>uid</code>) also remain; the button does not delete that Authentication record.</p>
+<p id="deletion-limits">The button deletes the Arca server records for this install described above when server deletion succeeds. It does not delete data already sent to Amplitude, AppsFlyer, Crashlytics, Apphud, or the AI providers (OpenRouter, Google Gemini / OpenAI); they retain data under their own policies. The recognition cache, transaction document, and Apple DeviceCheck bits also remain.</p>
 <p id="delete-contact">For help with deletion, email <a href="mailto:playnowthisgame@gmail.com">playnowthisgame@gmail.com</a>. “Delete my data” does not cancel your subscription; manage cancellation in your Apple ID subscription settings.</p>
-<p id="analytics-deletion">Analytics and attribution data (events, <code>uid</code>, and IDFV) are stored by Amplitude and AppsFlyer. The “Delete my data” button does not delete these data. To request their deletion, email Support at <a href="mailto:playnowthisgame@gmail.com?subject=Delete%20analytics%20data">playnowthisgame@gmail.com</a> with the subject “Delete analytics data” and include your app user ID from Settings, if it is shown. We will forward your deletion request to Amplitude and AppsFlyer.</p>
+<p id="analytics-deletion">Analytics and attribution data (events, <code>uid</code>, and IDFV) are stored by Amplitude and AppsFlyer. The “Delete my data” button does not delete these data. To request their deletion, email Support at <a href="mailto:playnowthisgame@gmail.com?subject=Delete%20analytics%20data">playnowthisgame@gmail.com</a> with the subject “Delete analytics data” and include your app user ID from Settings, if it is shown. Send this request before you use “Delete my data”: after deletion Arca starts a new app user ID, and the old one is no longer shown. We will forward your deletion request to Amplitude and AppsFlyer.</p>
 <h2>Permissions</h2>
 <p>You can revoke camera, photo library, and notification permissions in iOS Settings. Open Settings, find Arca, and change the relevant permissions; notification controls are also available under Notifications → Arca.</p>
 <h2>Children</h2>
